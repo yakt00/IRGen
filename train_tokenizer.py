@@ -17,6 +17,8 @@ import pytorch_warmup as warmup
 from dataset.dataset_inshop import Inshop
 from dataset.dataset_cub200 import CUB
 from dataset.dataset_cars196 import Cars
+from dataset.dataset_imagenet_val500 import ImageNet
+from dataset.dataset_places365 import Places
 from model.tokenizer import vitrqfc
 from model.DictTree import TreeNode
 from utils.utils import train_transform, get_trainable_params, residualquantizer
@@ -44,7 +46,7 @@ def get_features(Dataset, model):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Tokenizer')
     parser.add_argument('--data_dir', default='../data/isc/Img', type=str, help='datasets path')
-    parser.add_argument('--data_name', default='isc', type=str, choices=['car', 'cub', 'isc'],
+    parser.add_argument('--data_name', default='isc', type=str, choices=['car', 'cub', 'isc', 'imagenet', 'places'],
                         help='dataset name')
     parser.add_argument('--pretrained_model', default=None, type=str)
     parser.add_argument('--feats', default='inshop_clip_trainval.npy', type=str)
@@ -69,9 +71,16 @@ if __name__ == '__main__':
     elif data_name == 'cub':
         num_classes = 200
         Dataset = CUB(data_dir, 'db',transform=train_transform(256,224))
-    if data_name == 'car':
+    elif data_name == 'car':
         num_classes = 196
-        Dataset = Cars(data_dir, 'db',transform=train_transform(256,224))
+        Dataset = Cars(data_dir, 'db',transform=train_transform(256,224))  
+    elif data_name == 'imagenet':
+        num_classes = 1000
+        Dataset = ImageNet(data_dir, 'db',transform=train_transform(256,224))
+    elif data_name == 'places':
+        num_classes = 365
+        Dataset = Places(data_dir, 'db',transform=train_transform(256,224))
+
 
     model = vitrqfc(dec_depth=12, num_classes=num_classes)
     mm, preprocess = clip.load('ViT-B-16.pt')

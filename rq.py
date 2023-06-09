@@ -7,7 +7,7 @@ from model.DictTree import TreeNode
 
 
 parser = argparse.ArgumentParser(description='tokenizer')
-parser.add_argument('--data_name', default='car', type=str, choices=['car', 'cub', 'isc'],
+parser.add_argument('--data_name', default='car', type=str, choices=['car', 'cub', 'isc', 'imagenet', 'places'],
                     help='dataset name')
 parser.add_argument('--features', default='inshop_vitrqfc2_e200_trainval.npy', type=str)
 parser.add_argument('--file_name', default='isc_256rq2_1fc_ids.pkl', type=str)

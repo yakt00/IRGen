@@ -19,6 +19,8 @@ import pytorch_warmup as warmup
 from dataset.dataset_inshop import Inshop
 from dataset.dataset_cub200 import CUB
 from dataset.dataset_cars196 import Cars
+from dataset.dataset_imagenet_val500 import ImageNet
+from dataset.dataset_places365 import Places
 from model.CLIP.clip import clip
 from model.IRGen import IRGen
 from model.DictTree import TreeNode
@@ -37,7 +39,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Train IRGen')
     parser.add_argument('--data_dir', default='/mnt/default/data/isc/isc/Img', type=str, help='datasets path')
-    parser.add_argument('--data_name', default='car', type=str, choices=['car', 'cub', 'isc'],
+    parser.add_argument('--data_name', default='car', type=str, choices=['car', 'cub', 'isc', 'imagenet', 'places'],
                         help='dataset name')
     parser.add_argument('--file_name', default='in-shop_clothes_retrieval_trainval.pkl', type=str)
     parser.add_argument('--codes', default='isc_256rq4_ids.pkl', type=str, help='image identifier')
@@ -72,10 +74,17 @@ if __name__ == '__main__':
         Dataset = CUB(data_dir, 'db',transform=train_transform(256,224))
     elif data_name == 'car':
         Dataset = Cars(data_dir, 'db',transform=train_transform(256,224))
+    elif data_name == 'imagenet':
+        Dataset = ImageNet(data_dir, 'db',transform=train_transform(256,224))
+    elif data_name == 'places':
+        Dataset = Places(data_dir, 'db',transform=train_transform(256,224))
 
     train_sampler = DistributedSampler(Dataset, shuffle=True)
 
-    model = IRGen(dec_depth=12, num_classes=num_classes, id_len=id_length)
+    if data_name in ['isc', 'cub', 'car']:
+        model = IRGen(dec_depth=12, num_classes=num_classes, id_len=id_length)
+    else:
+        model = IRGen(dec_depth=24, num_classes=num_classes, id_len=id_length)
     mm, preprocess = clip.load('ViT-B-16.pt')
     mm = mm.to('cpu')
     mm=mm.type(torch.float32)

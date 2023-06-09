@@ -8,6 +8,8 @@ from model.DictTree import TreeNode
 from dataset.dataset_inshop import Inshop
 from dataset.dataset_cub200 import CUB
 from dataset.dataset_cars196 import Cars
+from dataset.dataset_imagenet_val500 import ImageNet
+from dataset.dataset_places365 import Places
 from dataset.config import config_gnd
 from utils.evaluate import compute_map
 from utils.logger import get_logger
@@ -37,7 +39,7 @@ def test(cfg, ks, ranks):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test IRGen')
     parser.add_argument('--data_dir', default='../data/isc/Img', type=str, help='datasets path')
-    parser.add_argument('--data_name', default='isc', type=str, choices=['car', 'cub', 'isc'],
+    parser.add_argument('--data_name', default='isc', type=str, choices=['car', 'cub', 'isc', 'imagenet', 'places'],
                         help='dataset name')
     parser.add_argument('--file_name', default='in-shop_clothes_retrieval.pkl', type=str)
     parser.add_argument('--codes', default='isc_256rq4_1fc_ids.pkl', type=str, help='image identifier')
@@ -71,8 +73,12 @@ if __name__ == '__main__':
         if data_name == 'isc':
             ids = ids[-12612:]
         id_length = ids.shape[-1]
-
-        model = IRGen(dec_depth=12, num_classes=256, id_len=id_length)
+        num_classes = np.unique(mapping).shape[0]
+        if data_name in ['isc', 'cub', 'car']:
+            model = IRGen(dec_depth=12, num_classes=num_classes, id_len=id_length)
+        else:
+            model = IRGen(dec_depth=24, num_classes=num_classes, id_len=id_length)
+ 
         mm, preprocess = clip.load('ViT-B-16.pt')
         mm = mm.to('cpu')
         mm=mm.type(torch.float32)
@@ -90,6 +96,11 @@ if __name__ == '__main__':
             Dataset = CUB(data_dir, 'query',transform=test_transform(256,224))
         elif data_name == 'car':
             Dataset = Cars(data_dir, 'query',transform=test_transform(256,224))
+        elif data_name == 'imagenet':
+        Dataset = ImageNet(data_dir, 'db',transform=train_transform(256,224))
+        elif data_name == 'places':
+            Dataset = Places(data_dir, 'db',transform=train_transform(256,224))
+
         test_loader = DataLoader(Dataset, batch_size=1)
         cfg = config_gnd(data_dir, file_name)
         gnd = cfg['gnd']
