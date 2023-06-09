@@ -26,7 +26,7 @@ python gnd_generater.py
 python train_tokenizer.py 
 optional arguments:
 --data_path                   datasets path [default value is 'data']
---data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc'])
+--data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc', 'imagenet', 'places'])
 --feats                       initialize features for quantize [default value is '']
 --output_dir                  saving output direction [default value is 'results']
 --lr                          train learning rate [default value is 5e-4]
@@ -38,14 +38,14 @@ optional arguments:
 ```
 python rq.py --features 'isc_features.npy' --file_name 'isc_rq.pkl' --data_dir 'data/isc'
 optional arguments:
---data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc'])
+--data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc', 'imagenet', 'places'])
 ```
 ### Train IRGen
 ```
 python -m torch.distributed.launch --nproc_per_node=8 train_ar.py --file_name 'in-shop_clothes_retrieval_trainval.pkl' --codes 'isc_rq.pkl'
 optional arguments:
 --data_dir                    datasets path [default value is 'data/isc/Img']
---data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc'])
+--data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc', 'imagenet', 'places'])
 --output_dir                  saving output direction [default value is 'results']
 --lr                          train learning rate [default value is 8e-5]
 --batch_size                  train batch size [default value is 64]
@@ -58,15 +58,16 @@ optional arguments:
 python test_ar.py --file_name 'in-shop_clothes_retrieval_trainval.pkl' --codes 'isc_rq.pkl' --model_dir 'results/isc_rq_e200.pkl' 
 optional arguments:
 --data_dir                    datasets path [default value is 'data/isc/Img']
---data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc'])
+--data_name                   dataset name [default value is 'isc'](choices=['car', 'cub', 'isc', 'imagenet', 'places'])
 --beam_size                   size for beam search [default value is 30]
 --ks                          query number for test@k[default value is [1,10,20,30]]
 ```
 
 ## Benchmarks
-The models are trained on one NVIDIA Tesla V100 (32G) GPU. 
+The models are trained on 8 NVIDIA Tesla V100 (32G) GPU. 
 
 ### In-shop
+P refers to precision, R refers to recall.
 <table>
   <thead>
     <tr>
@@ -152,15 +153,15 @@ The models are trained on one NVIDIA Tesla V100 (32G) GPU.
 
 
 ## Results
-
+The Precision-Recall curve.
 ### In-shop Clothes
 
-![ISC](assets/isc.pdf)
+![ISC](assets/inshop_pr.png)
 
 ### CUB200
 
-![CUB](assets/cub.pdf)
+![CUB](assets/cub_pr.png)
 
 ### Cars196
 
-![Cars](assets/cars.pdf)
+![Cars](assets/cars_pr.png)
