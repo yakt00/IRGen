@@ -1,7 +1,7 @@
 # IRGen
 A PyTorch implementation of IRGen based on the paper [IRGen: Generative Modeling for Image Retrieval](https://arxiv.org/abs/2303.10126).
 
-![Network Architecture image from the paper](assets/IRGen.pdf)
+![Network Architecture image from the paper](assets/arir.png)
 
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
